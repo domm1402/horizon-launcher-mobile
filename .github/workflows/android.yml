@@ -17,11 +17,11 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: "latest"
-          packages: |
-            platforms;android-35
-            build-tools;35.0.0
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - uses: gradle/actions/setup-gradle@v4
-      - run: gradle assembleDebug
+      - name: Build debug APK
+        run: gradle assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: HorizonLauncherMobile-debug-apk
