@@ -31,10 +31,11 @@ class BedrockAccount(context:Context){
   val x=post("https://user.auth.xboxlive.com/user/authenticate",JSONObject().put("Properties",JSONObject().put("AuthMethod","RPS").put("SiteName","user.auth.xboxlive.com").put("RpsTicket","d="+m.getString("access_token"))).put("RelyingParty","http://auth.xboxlive.com").put("TokenType","JWT").toString()
   val u=x.getJSONObject("DisplayClaims").getJSONArray("xui").getJSONObject(0).getString("uhs")
   val z=post("https://xsts.auth.xboxlive.com/xsts/authorize",JSONObject().put("Properties",JSONObject().put("SandboxId","RETAIL").put("UserTokens",org.json.JSONArray().put(x.getString("Token")))).put("RelyingParty","rp://api.minecraftservices.com/").put("TokenType","JWT").toString()
+  val realm=post("https://xsts.auth.xboxlive.com/xsts/authorize",JSONObject().put("Properties",JSONObject().put("SandboxId","RETAIL").put("UserTokens",org.json.JSONArray().put(x.getString("Token")))).put("RelyingParty","https://pocket.realms.minecraft.net/").put("TokenType","JWT").toString()
   val mc=post("https://api.minecraftservices.com/authentication/login_with_xbox",JSONObject().put("identityToken","XBL3.0 x=$u;"+z.getString("Token")).toString())
   fun get(path:String)=JSONObject(URL("https://api.minecraftservices.com/$path").openConnection().apply{setRequestProperty("Authorization","Bearer "+mc.getString("access_token"))}.getInputStream().bufferedReader().use{it.readText()})
   val profile=get("minecraft/profile");val ent=get("entitlements/mcstore");val owned=ent.optJSONArray("items")?.length()?.let{it>0}?:false
-  prefs.edit().putString("gamertag",profile.optString("name")).putString("uuid",profile.optString("id")).putBoolean("owns_game",owned).putString("msa_refresh",m.optString("refresh_token")).apply()
+  prefs.edit().putString("realm_xsts",xt).putString("xuid",x.getJSONObject("DisplayClaims").getJSONArray("xui").getJSONObject(0).optString("xid")).putString("gamertag",profile.optString("name")).putString("uuid",profile.optString("id")).putBoolean("owns_game",owned).putString("msa_refresh",m.optString("refresh_token")).apply()
   status("Signed in: "+profile.optString("name")+" | ownership "+if(owned)"verified" else "not verified")
  }catch(ex:Exception){error(ex)}}}
 }
