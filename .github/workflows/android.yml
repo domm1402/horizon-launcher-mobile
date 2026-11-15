@@ -41,7 +41,7 @@ jobs:
           runtime = Path("packaging/android/runtime.json")
           data = json.loads(runtime.read_text())
           data["application_id"] = "gg.horizon.launchermobile"
-          runtime.write_text(json.dumps(data, indent=2) + "\\n")
+          runtime.write_text(json.dumps(data, indent=2) + "\n")
           source = Path("crates/launcher/src/lib.rs")
           text = source.read_text()
           old = '        "Cinnabar"'
