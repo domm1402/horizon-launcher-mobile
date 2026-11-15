@@ -1,21 +1,20 @@
-# RealmForge
-Independent Android Bedrock-client research project. No Cinnabar source is reused.
+# RealmForge Android
 
-## Build
-GitHub Actions → **Build RealmForge APK** → run workflow → download `RealmForge-debug-apk`.
+Independent Android Bedrock client engineering project. This is not yet a playable or Realm-compatible client.
 
-## Status
-This is a navigable Android UI shell, **not a Minecraft/Bedrock game client**. It cannot join servers or Realms. No Minecraft credentials are collected.
+## Implemented
+- Android launcher UI
+- Microsoft device-code OAuth, Xbox Live/XSTS, Minecraft Services profile and entitlement check (app ID must be registered)
+- Local world metadata and directories (not chunk saves)
+- WebRTC PeerConnection/DataChannel transport primitive
 
-## Engineering backlog (not implemented)
-- Microsoft OAuth device-code flow, secure token storage, Xbox Live/XSTS and Minecraft Services identity chain
-- Bedrock entitlement verification before multiplayer
-- Bedrock protocol version negotiation, RakNet reliability, packet encryption/compression and session lifecycle
-- Realms API discovery/invites/join
-- NetherNet peer transport, WebRTC ICE, TURN alternate-server handling and relay fallback
-- Voxel renderer, Vulkan capability detection/fallback, chunk meshing/streaming and frame pacing
-- Touch controls, inventory/UI, audio
-- Local world persistence, resource packs and settings
-- Integration tests against owned accounts and test servers
+## Microsoft application ID
+Register a public-client app in Microsoft Entra yourself. Client IDs cannot be invented or registered by this repository. Replace the placeholder in BedrockAccount.kt and enable consumer accounts/device-code flow. No Microsoft-owned app ID is bundled.
 
-These systems require implementation and validation. This repository does not claim Realm compatibility yet.
+## NetherNet / Realms gap
+Generic WebRTC is a transport primitive, not Minecraft NetherNet. Realm joining still requires authenticated NetherNet signaling, relay allocation/TURN credentials, SDP/candidate exchange, packet framing, Bedrock RakNet/session encryption and Realm discovery/join APIs. Public STUN is not a substitute for Minecraft relay service. No fake Join Realm success is shown.
+
+## Remaining gameplay
+Bedrock protocol/version negotiation; RakNet reliability/encryption; NetherNet signaling/relay; Realms APIs; voxel renderer/Vulkan; touch input; world generator/chunk serialization/resource packs; device testing.
+
+GitHub Actions builds a debug APK artifact.
