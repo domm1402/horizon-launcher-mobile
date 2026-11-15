@@ -37,7 +37,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json
-          from pathlib import import Path
+          from pathlib import Path
           runtime = Path("packaging/android/runtime.json")
           data = json.loads(runtime.read_text())
           data["application_id"] = "gg.horizon.launchermobile"
