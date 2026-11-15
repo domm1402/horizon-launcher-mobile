@@ -1,40 +1,28 @@
-# Horizon Bedrock for Android
+# Cinnabar for Android
 
-Horizon Bedrock is the Android game client build for the Horizon project. The Android APK
-contains the Cinnabar Bedrock client and its native runtime in one installable package.
-You do not need to install a separate Cinnabar app.
+This repository builds the upstream Cinnabar Android client as a single installable APK.
+The build does not rename or patch the upstream application: it keeps Cinnabar's own
+application ID, product name, and Android packaging implementation.
 
-## Android build
+## Build
 
-The `Android APK` GitHub Actions workflow checks out a pinned Cinnabar source revision,
-applies Horizon's Android application ID and product branding, and runs Cinnabar's own
-Android packaging script. The result is a single arm64-v8a APK containing the Rust/Bevy
-client, Go Bedrock networking core, and Android native libraries.
+The **Cinnabar Android APK** workflow checks out the pinned upstream source revision
+`08446aa3aec50c42497cf5b37cdaffbfcb29a185`, installs the Android/Rust/Go toolchains,
+and runs Cinnabar's own `packaging/android/build-apk.sh` script.
 
-To build it, open **Actions → Android APK → Run workflow**. Download the
-`Horizon-Bedrock-Android-APK` artifact from the completed run. The build currently targets
-64-bit ARM Android 8+ devices with Vulkan support.
+When the workflow completes successfully, download the
+`Cinnabar-Android-APK` artifact from the GitHub Actions run. The APK targets
+`arm64-v8a`, Android API 26 or later, and requires Vulkan support.
 
-The engine source is pinned to
-[`cinnabar-mc/cinnabar` revision `08446aa3aec50c42497cf5b37cdaffbfcb29a185`](https://github.com/cinnabar-mc/cinnabar/tree/08446aa3aec50c42497cf5b37cdaffbfcb29a185).
-This keeps builds reproducible and avoids downloading a second APK at runtime.
+## Important limitations
 
-## Current scope and limitations
+Cinnabar's Android support is experimental. This repository has not independently
+verified compatibility, gameplay, multiplayer, or performance on physical devices.
+The generated APK is test-signed unless a maintainer configures a private signing
+keystore. It is not a Play Store release.
 
-This first integration builds the Cinnabar Android client as the Horizon Bedrock app. It does
-not yet merge the old Kotlin Horizon launcher screens into the in-game client. Microsoft/Xbox
-sign-in and Bedrock server connectivity are provided by Cinnabar's existing implementation.
-A separate, verified Minecraft ownership entitlement gate that limits unowned accounts to
-singleplayer has **not** been implemented yet; do not treat the current APK as enforcing that
-policy. Android support is experimental upstream, and compatibility/performance must be
-tested on physical devices.
+Cinnabar is licensed under PolyForm Noncommercial 1.0.0. Use and redistribution must
+comply with that licence and the upstream third-party notices. Minecraft is a
+Microsoft/Mojang trademark; this project is unofficial and is not endorsed by them.
 
-## Licensing
-
-Cinnabar is distributed under the
-[PolyForm Noncommercial 1.0.0 licence](https://polyformproject.org/licenses/noncommercial/1.0.0).
-This build is intended for permitted noncommercial use only. Read Cinnabar's
-[licence](https://github.com/cinnabar-mc/cinnabar/blob/08446aa3aec50c42497cf5b37cdaffbfcb29a185/LICENSE)
-and [third-party notices](https://github.com/cinnabar-mc/cinnabar/blob/08446aa3aec50c42497cf5b37cdaffbfcb29a185/THIRD_PARTY_NOTICES.md)
-before using or redistributing the APK. Minecraft is a trademark of Microsoft; Horizon and
-Cinnabar are independent, unofficial projects and are not endorsed by Microsoft or Mojang.
+Upstream: https://github.com/cinnabar-mc/cinnabar
