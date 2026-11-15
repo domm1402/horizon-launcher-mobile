@@ -35,7 +35,7 @@ class BedrockAccount(context:Context){
   val mc=post("https://api.minecraftservices.com/authentication/login_with_xbox",JSONObject().put("identityToken","XBL3.0 x=$u;"+z.getString("Token")).toString())
   fun get(path:String)=JSONObject(URL("https://api.minecraftservices.com/$path").openConnection().apply{setRequestProperty("Authorization","Bearer "+mc.getString("access_token"))}.getInputStream().bufferedReader().use{it.readText()})
   val profile=get("minecraft/profile");val ent=get("entitlements/mcstore");val owned=ent.optJSONArray("items")?.length()?.let{it>0}?:false
-  prefs.edit().putString("realm_xsts",xt).putString("xuid",x.getJSONObject("DisplayClaims").getJSONArray("xui").getJSONObject(0).optString("xid")).putString("gamertag",profile.optString("name")).putString("uuid",profile.optString("id")).putBoolean("owns_game",owned).putString("msa_refresh",m.optString("refresh_token")).apply()
+  prefs.edit().putString("realm_xsts",xt).putString("xuid",u).putString("gamertag",profile.optString("name")).putString("uuid",profile.optString("id")).putBoolean("owns_game",owned).putString("msa_refresh",m.optString("refresh_token")).apply()
   status("Signed in: "+profile.optString("name")+" | ownership "+if(owned)"verified" else "not verified")
  }catch(ex:Exception){error(ex)}}}
 }
