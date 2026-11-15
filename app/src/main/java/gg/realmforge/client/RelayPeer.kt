@@ -13,6 +13,7 @@ class RelayPeer(private val factory:PeerConnectionFactory,private val executor:E
    val left=bytes[0].toInt() and 255;val part=bytes.copyOfRange(1,bytes.size)
    synchronized(fragments){if(left>0){fragments.write(part);return};if(fragments.size()>0){fragments.write(part);onPacket(fragments.toByteArray(),d.label()=="ReliableDataChannel");fragments.reset()}else onPacket(part,d.label()=="ReliableDataChannel")}
  })}
+ }
  fun connect(remoteSdp:String,remoteType:SessionDescription.Type,sendSignal:(SessionDescription)->Unit){executor.execute{
   val cfg=PeerConnection.RTCConfiguration(emptyList()).apply{sdpSemantics=PeerConnection.SdpSemantics.UNIFIED_PLAN;iceTransportsType=PeerConnection.IceTransportsType.ALL}
   peer=factory.createPeerConnection(cfg,object:PeerConnection.Observer{
