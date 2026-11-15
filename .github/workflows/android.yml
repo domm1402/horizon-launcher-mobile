@@ -2,7 +2,7 @@ name: Horizon Bedrock APK
 
 on:
   push:
-    branches: [cinnabar-android-integration]
+    branches: [main, cinnabar-android-integration]
   workflow_dispatch:
 
 permissions:
