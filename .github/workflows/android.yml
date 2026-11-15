@@ -1,29 +1,95 @@
-name: Android APK
+name: Horizon Bedrock APK
+
 on:
   push:
-    branches: [main]
+    branches: [main, cinnabar-android-integration]
   workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: horizon-bedrock-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build embedded Cinnabar Android client
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CINNABAR_ANDROID_PROFILE: play
+      CARGO_INCREMENTAL: "0"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Check out Horizon
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check out pinned Cinnabar engine
+        uses: actions/checkout@v4
+        with:
+          repository: cinnabar-mc/cinnabar
+          ref: 08446aa3aec50c42497cf5b37cdaffbfcb29a185
+          path: cinnabar
+          persist-credentials: false
+      - name: Brand the bundled client as Horizon
+        working-directory: cinnabar
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import import Path
+          runtime = Path("packaging/android/runtime.json")
+          data = json.loads(runtime.read_text())
+          data["application_id"] = "gg.horizon.launchermobile"
+          runtime.write_text(json.dumps(data, indent=2) + "\n")
+          source = Path("crates/launcher/src/lib.rs")
+          text = source.read_text()
+          old = '        "Cinnabar"'
+          if old not in text:
+              raise SystemExit("Could not locate upstream product name; refusing an unsafe patch")
+          source.write_text(text.replace(old, '        "Horizon Bedrock"', 1))
+          PY
+      - name: Install Rust Android target
+        uses: dtolnay/rust-toolchain@1.99.0
+        with:
+          targets: aarch64-linux-android
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - name: Install Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: "latest"
-          packages: platform-tools
-      - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-      - uses: gradle/actions/setup-gradle@v4
-      - name: Build debug APK
-        run: gradle assembleDebug
+      - name: Install pinned Android SDK packages and cargo-ndk
+        working-directory: cinnabar
+        run: |
+          pin() { python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])' packaging/android/runtime.json "$1"; }
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            "platforms;android-$(pin target_sdk)" "build-tools;$(pin build_tools)" "ndk;$(pin ndk)" >/dev/null
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$(pin ndk)" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$(pin ndk)" >> "$GITHUB_ENV"
+          cargo install cargo-ndk --version "$(pin cargo_ndk)" --locked
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends librsvg2-bin cmake ninja-build gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: Build the single Horizon Bedrock APK
+        working-directory: cinnabar
+        run: bash packaging/android/build-apk.sh
+      - name: Verify APK and report checksum
+        working-directory: cinnabar
+        run: |
+          apk="$(find target/android -maxdepth 1 -name 'Horizon Bedrock-*-arm64-v8a.apk' -print -quit)"
+          test -n "$apk"
+          sha256sum "$apk" | tee target/android/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: HorizonLauncherMobile-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: Horizon-Bedrock-Android-APK
+          path: |
+            cinnabar/target/android/Horizon Bedrock-*-arm64-v8a.apk
+            cinnabar/target/android/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
