@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.Gravity
-import android.widget.*\nimport android.app.AlertDialog
+import android.widget.*
+import android.app.AlertDialog
 class MainActivity:Activity(){
  private val bg=Color.rgb(12,17,25);private val panel=Color.rgb(22,30,42);private val blue=Color.rgb(80,175,255);private lateinit var body:LinearLayout
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);window.statusBarColor=bg;window.navigationBarColor=bg;show("Home")}
