@@ -1,17 +1,21 @@
-# RealmForge Android
+# RealmForge
+Independent Android Bedrock-client research project. No Cinnabar source is reused.
 
-This repository has been reset to an independent Android project (no Cinnabar source).
+## Build
+GitHub Actions → **Build RealmForge APK** → run workflow → download `RealmForge-debug-apk`.
 
-## Build APK
-Push to `main` or use Actions → **Build RealmForge APK** → Run workflow. Download artifact `RealmForge-debug-apk`.
+## Status
+This is a navigable Android UI shell, **not a Minecraft/Bedrock game client**. It cannot join servers or Realms. No Minecraft credentials are collected.
 
-## Current state
-The APK is an installable Android shell only. It is **not a playable Minecraft client**. Rendering, Bedrock protocol, Microsoft/Xbox authentication, entitlement checks, Realms APIs, and NetherNet/WebRTC relay are not implemented. This repository does not claim Realm compatibility yet.
+## Engineering backlog (not implemented)
+- Microsoft OAuth device-code flow, secure token storage, Xbox Live/XSTS and Minecraft Services identity chain
+- Bedrock entitlement verification before multiplayer
+- Bedrock protocol version negotiation, RakNet reliability, packet encryption/compression and session lifecycle
+- Realms API discovery/invites/join
+- NetherNet peer transport, WebRTC ICE, TURN alternate-server handling and relay fallback
+- Voxel renderer, Vulkan capability detection/fallback, chunk meshing/streaming and frame pacing
+- Touch controls, inventory/UI, audio
+- Local world persistence, resource packs and settings
+- Integration tests against owned accounts and test servers
 
-## Next technical milestones
-1. Define clean-room client architecture and legal protocol implementation scope.
-2. Add Microsoft device-code authentication and ownership verification.
-3. Implement Bedrock packet/session layer and reliable encryption.
-4. Implement Realms discovery and NetherNet/WebRTC TURN relaying.
-5. Add Vulkan renderer, chunk pipeline, touch controls, local world storage.
-6. Test with owned Bedrock accounts and Realms.
+These systems require implementation and validation. This repository does not claim Realm compatibility yet.
