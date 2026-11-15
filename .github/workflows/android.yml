@@ -1,20 +1,20 @@
-name: Horizon Bedrock APK
+name: Cinnabar Android APK
 
 on:
   push:
-    branches: [main, cinnabar-android-integration]
+    branches: [main, cinnabar-android-integration, cinnabar-clean-apk]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: horizon-bedrock-${{ github.ref }}
+  group: cinnabar-clean-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build embedded Cinnabar Android client
+    name: Build upstream Cinnabar Android client
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -32,23 +32,6 @@ jobs:
           ref: 08446aa3aec50c42497cf5b37cdaffbfcb29a185
           path: cinnabar
           persist-credentials: false
-      - name: Brand the bundled client as Horizon
-        working-directory: cinnabar
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          runtime = Path("packaging/android/runtime.json")
-          data = json.loads(runtime.read_text())
-          data["application_id"] = "gg.horizon.launchermobile"
-          runtime.write_text(json.dumps(data, indent=2) + "\n")
-          source = Path("crates/launcher/src/lib.rs")
-          text = source.read_text()
-          old = '        "Cinnabar"'
-          if old not in text:
-              raise SystemExit("Could not locate upstream product name; refusing an unsafe patch")
-          source.write_text(text.replace(old, '        "Horizon Bedrock"', 1))
-          PY
       - name: Install Rust Android target
         uses: dtolnay/rust-toolchain@1.99.0
         with:
@@ -76,18 +59,18 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends librsvg2-bin cmake ninja-build gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-      - name: Build the single Horizon Bedrock APK
+      - name: Build the unmodified Cinnabar APK
         working-directory: cinnabar
         run: bash packaging/android/build-apk.sh
       - name: Verify APK and report checksum
         working-directory: cinnabar
         run: |
-          apk="$(find target/android -maxdepth 1 -name 'Horizon Bedrock-*-arm64-v8a.apk' -print -quit)"
+          apk="$(find target/android -maxdepth 1 -name 'Cinnabar-*-arm64-v8a.apk' -print -quit)"
           test -n "$apk"
           sha256sum "$apk" | tee target/android/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: Horizon-Bedrock-Android-APK
+          name: Cinnabar-Android-APK
           path: |
             cinnabar/target/android/Horizon Bedrock-*-arm64-v8a.apk
             cinnabar/target/android/SHA256SUMS.txt
